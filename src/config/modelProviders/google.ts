@@ -6,6 +6,18 @@ const Google: ModelProviderCard = {
     {
       contextWindowTokens: 1_048_576 + 65_536,
       description:
+        'Gemini 2.5 Pro 是 Google 最新的通用多模态模型，提供更强的推理、代码与长上下文能力，适用于复杂任务场景。',
+      displayName: 'Gemini 2.5 Pro',
+      enabled: true,
+      functionCall: true,
+      id: 'gemini-2.5-pro',
+      maxOutput: 65_536,
+      releasedAt: '2025-06-17',
+      vision: true,
+    },
+    {
+      contextWindowTokens: 1_048_576 + 65_536,
+      description:
         'Gemini 2.5 Pro Experimental 是 Google 最先进的思维模型，能够对代码、数学和STEM领域的复杂问题进行推理，以及使用长上下文分析大型数据集、代码库和文档。',
       displayName: 'Gemini 2.5 Pro Experimental 03-25',
       enabled: true,

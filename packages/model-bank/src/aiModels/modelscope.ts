@@ -47,6 +47,42 @@ const modelscopeChatModels: AIChatModelCard[] = [
     abilities: {
       functionCall: true,
       reasoning: true,
+      vision: true,
+    },
+    contextWindowTokens: 131_072,
+    description: 'Qwen3-VL-30B A3B 指令调优版本，支持多模态推理与理解。',
+    displayName: 'Qwen3-VL-30B A3B Instruct',
+    id: 'Qwen/Qwen3-VL-30B-A3B-Instruct',
+    type: 'chat',
+  },
+  {
+    abilities: {
+      functionCall: true,
+      reasoning: true,
+      vision: true,
+    },
+    contextWindowTokens: 131_072,
+    description: 'Qwen3-VL-235B A22B 指令调优版本，具备顶级多模态理解和生成能力。',
+    displayName: 'Qwen3-VL-235B A22B Instruct',
+    id: 'Qwen/Qwen3-VL-235B-A22B-Instruct',
+    type: 'chat',
+  },
+  {
+    abilities: {
+      functionCall: true,
+      reasoning: true,
+      vision: true,
+    },
+    contextWindowTokens: 131_072,
+    description: 'Qwen3-VL-30B A3B 思考（Thinking）版本，支持更强的推理链与多模态能力。',
+    displayName: 'Qwen3-VL-30B A3B Thinking',
+    id: 'Qwen/Qwen3-VL-30B-A3B-Thinking',
+    type: 'chat',
+  },
+  {
+    abilities: {
+      functionCall: true,
+      reasoning: true,
     },
     contextWindowTokens: 131_072,
     description:
