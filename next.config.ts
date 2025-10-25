@@ -286,6 +286,11 @@ const nextConfig: NextConfig = {
       layers: true,
     };
 
+    // Disable/adjust cache on Vercel to avoid large packfile serialization and OOM
+    if (process.env.VERCEL) {
+      config.cache = false;
+    }
+
     // 开启该插件会导致 pglite 的 fs bundler 被改表
     if (enableReactScan && !isUsePglite) {
       config.plugins.push(ReactComponentName({}));
@@ -336,7 +341,7 @@ const noWrapper = (config: NextConfig) => config;
 const withBundleAnalyzer = process.env.ANALYZE === 'true' ? analyzer() : noWrapper;
 
 const withPWA =
-  isProd && !isDesktop
+  isProd && !isDesktop && !process.env.VERCEL
     ? withSerwistInit({
         register: false,
         swDest: 'public/sw.js',
