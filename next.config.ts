@@ -32,22 +32,24 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    optimizePackageImports: [
-      'emoji-mart',
-      '@emoji-mart/react',
-      '@emoji-mart/data',
-      '@icons-pack/react-simple-icons',
-      '@lobehub/ui',
-      '@lobehub/icons',
-      'gpt-tokenizer',
-    ],
+    optimizePackageImports: process.env.VERCEL
+      ? undefined
+      : [
+          'emoji-mart',
+          '@emoji-mart/react',
+          '@emoji-mart/data',
+          '@icons-pack/react-simple-icons',
+          '@lobehub/ui',
+          '@lobehub/icons',
+          'gpt-tokenizer',
+        ],
     // oidc provider depend on constructor.name
     // but swc minification will remove the name
     // so we need to disable it
     // refs: https://github.com/lobehub/lobe-chat/pull/7430
     serverMinification: false,
     webVitalsAttribution: ['CLS', 'LCP'],
-    webpackBuildWorker: true,
+    webpackBuildWorker: process.env.VERCEL ? false : true,
     webpackMemoryOptimizations: true,
   },
   async headers() {
@@ -271,7 +273,7 @@ const nextConfig: NextConfig = {
   ],
 
   // when external packages in dev mode with turbopack, this config will lead to bundle error
-  serverExternalPackages: isProd ? ['@electric-sql/pglite', "pdfkit"] : ["pdfkit"],
+  serverExternalPackages: isProd ? ['@electric-sql/pglite', 'pdfkit'] : ['pdfkit'],
   transpilePackages: ['pdfjs-dist', 'mermaid'],
 
   typescript: {
@@ -336,10 +338,10 @@ const withBundleAnalyzer = process.env.ANALYZE === 'true' ? analyzer() : noWrapp
 const withPWA =
   isProd && !isDesktop
     ? withSerwistInit({
-      register: false,
-      swDest: 'public/sw.js',
-      swSrc: 'src/app/sw.ts',
-    })
+        register: false,
+        swDest: 'public/sw.js',
+        swSrc: 'src/app/sw.ts',
+      })
     : noWrapper;
 
 export default withBundleAnalyzer(withPWA(nextConfig as NextConfig));
