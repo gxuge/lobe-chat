@@ -1,8 +1,8 @@
 ## Set global build ENV
-ARG NODEJS_VERSION="24"
+ARG NODEJS_VERSION="22"
 
 ## Base image for all building stages
-FROM node:${NODEJS_VERSION}-slim AS base
+FROM docker.1ms.run/library/node:${NODEJS_VERSION}-slim AS base
 
 ARG USE_CN_MIRROR
 
@@ -36,11 +36,9 @@ RUN \
 FROM base AS builder
 
 ARG USE_CN_MIRROR
-ARG NEXT_PUBLIC_BASE_PATH
 ARG NEXT_PUBLIC_SERVICE_MODE
 ARG NEXT_PUBLIC_ENABLE_NEXT_AUTH
 ARG NEXT_PUBLIC_ENABLE_CLERK_AUTH
-ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 ARG NEXT_PUBLIC_SENTRY_DSN
 ARG NEXT_PUBLIC_ANALYTICS_POSTHOG
 ARG NEXT_PUBLIC_POSTHOG_HOST
@@ -50,18 +48,15 @@ ARG NEXT_PUBLIC_UMAMI_SCRIPT_URL
 ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
 ARG FEATURE_FLAGS
 
-ENV NEXT_PUBLIC_BASE_PATH="${NEXT_PUBLIC_BASE_PATH}" \
-    FEATURE_FLAGS="${FEATURE_FLAGS}"
+ENV FEATURE_FLAGS="${FEATURE_FLAGS}"
 
 ENV NEXT_PUBLIC_SERVICE_MODE="${NEXT_PUBLIC_SERVICE_MODE:-server}" \
     NEXT_PUBLIC_ENABLE_NEXT_AUTH="${NEXT_PUBLIC_ENABLE_NEXT_AUTH:-1}" \
     NEXT_PUBLIC_ENABLE_CLERK_AUTH="${NEXT_PUBLIC_ENABLE_CLERK_AUTH:-0}" \
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}" \
-    CLERK_WEBHOOK_SECRET="whsec_xxx" \
-    APP_URL="http://app.com" \
+    APP_URL="http://localhost:3015" \
     DATABASE_DRIVER="node" \
-    DATABASE_URL="postgres://postgres:password@localhost:5432/postgres" \
-    KEY_VAULTS_SECRET="use-for-build"
+    DATABASE_URL="postgres://postgres:635764803@106.52.245.55:5432/postgres?sslmode=no-verify" \
+    KEY_VAULTS_SECRET="jgwsK28dspyVQoIf8/M3IIHl1h6LYYceSYNXeLpy6uk="
 
 # Sentry
 ENV NEXT_PUBLIC_SENTRY_DSN="${NEXT_PUBLIC_SENTRY_DSN}" \
@@ -113,10 +108,11 @@ RUN \
 COPY . .
 
 # run build standalone for docker version
+RUN sed -i 's/"prebuild":.*/"prebuild": "echo skip",/' package.json
 RUN npm run build:docker
 
-## Application image, copy all the files for production
-FROM busybox:latest AS app
+    ## Application image, copy all the files for production
+FROM docker.1ms.run/library/busybox:latest AS app
 
 COPY --from=base /distroless/ /
 
@@ -166,7 +162,7 @@ ENV HOSTNAME="0.0.0.0" \
 
 # General Variables
 ENV ACCESS_CODE="" \
-    APP_URL="" \
+    APP_URL="http://localhost:3015" \
     API_KEY_SELECT_MODE="" \
     DEFAULT_AGENT_CONFIG="" \
     SYSTEM_AGENT="" \
@@ -175,26 +171,24 @@ ENV ACCESS_CODE="" \
     ENABLE_AUTH_PROTECTION=""
 
 # Database
-ENV KEY_VAULTS_SECRET="" \
+ENV KEY_VAULTS_SECRET="jgwsK28dspyVQoIf8/M3IIHl1h6LYYceSYNXeLpy6uk=" \
     DATABASE_DRIVER="node" \
-    DATABASE_URL=""
+    DATABASE_URL="postgres://postgres:635764803@106.52.245.55:5432/postgres?sslmode=no-verify"
 
 # Next Auth
 ENV NEXT_AUTH_SECRET="" \
     NEXT_AUTH_SSO_PROVIDERS="" \
     NEXTAUTH_URL=""
 
-# Clerk
-ENV CLERK_SECRET_KEY="" \
-    CLERK_WEBHOOK_SECRET=""
+ 
 
 # S3
 ENV NEXT_PUBLIC_S3_DOMAIN="" \
-    S3_PUBLIC_DOMAIN="" \
-    S3_ACCESS_KEY_ID="" \
-    S3_BUCKET="" \
-    S3_ENDPOINT="" \
-    S3_SECRET_ACCESS_KEY="" \
+    S3_PUBLIC_DOMAIN="https://oss.6357648.xyz" \
+    S3_ACCESS_KEY_ID="fb104242065d9093a7f535cd367bf187" \
+    S3_BUCKET="lobe" \
+    S3_ENDPOINT="https://838de6c927cbb6dc5aa8476ec542f803.r2.cloudflarestorage.com" \
+    S3_SECRET_ACCESS_KEY="2374960dd85bc91072f58bf8d15ddc341934eecc6b005d36459720e054710b99" \
     S3_ENABLE_PATH_STYLE="" \
     S3_SET_ACL=""
 

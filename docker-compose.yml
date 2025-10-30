@@ -1,0 +1,66 @@
+services:
+  lobe-chat:
+    build:
+      context: .
+      dockerfile: Dockerfile.database
+      args:
+        USE_CN_MIRROR: "true"
+        # 启用 NextAuth（构建时）
+        NEXT_PUBLIC_ENABLE_NEXT_AUTH: "1"
+        # 关闭 Clerk（构建时）
+        NEXT_PUBLIC_ENABLE_CLERK_AUTH: "0"
+    image: lobe-chat:database
+    ports:
+      - "3210:3210"
+    environment:
+      NEXT_PUBLIC_SERVICE_MODE: "server"
+      DATABASE_DRIVER: "node"
+      DATABASE_URL: ${DATABASE_URL}
+      KEY_VAULTS_SECRET: ${KEY_VAULTS_SECRET}
+      APP_URL: "https://chat.woguoguoguo.top"
+      ENABLE_AUTH_PROTECTION: "1"
+      
+      # 启用 NextAuth（运行时）
+      NEXT_PUBLIC_ENABLE_NEXT_AUTH: "1"
+      # 关闭 Clerk（运行时）
+      NEXT_PUBLIC_ENABLE_CLERK_AUTH: "0"
+      # NextAuth 基本设置
+      NEXT_AUTH_SECRET: ${NEXT_AUTH_SECRET}
+      NEXT_AUTH_SSO_PROVIDERS: "keycloak"
+      NEXTAUTH_URL: "https://chat.woguoguoguo.top/api/auth"
+      # Keycloak Provider 配置
+      AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
+      AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
+      AUTH_KEYCLOAK_ISSUER: ${AUTH_KEYCLOAK_ISSUER}
+      # OPTIONALS
+      # ACCESS_CODE: ${ACCESS_CODE}
+      # FEATURE_FLAGS: ${FEATURE_FLAGS}
+      # OPENAI_API_KEY: ${OPENAI_API_KEY}
+      # S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      # S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      # S3_BUCKET: ${S3_BUCKET}
+      # S3_ENDPOINT: ${S3_ENDPOINT}
+      # S3_PUBLIC_DOMAIN: ${S3_PUBLIC_DOMAIN}
+    volumes:
+      # 挂载应用运行时可能产生的持久化数据（如上传的文件、缓存等）
+      - lobe_chat_data:/app/data
+      # 挂载应用日志，方便排查问题
+      - lobe_chat_logs:/app/logs
+      # (可选) 挂载配置文件，如需自定义
+      # - ./path/to/your/config:/app/config
+    restart: unless-stopped
+
+  # One-off migration job (uncomment and run once):
+  # migrate:
+  #   image: lobe-chat:database
+  #   depends_on: []
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #   entrypoint: ["/bin/node", "/app/docker.cjs"]
+  #   restart: "no"
+
+volumes:
+  lobe_chat_data:
+    driver: local
+  lobe_chat_logs:
+    driver: local
