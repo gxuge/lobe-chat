@@ -25,6 +25,9 @@ export const users = pgTable('users', {
   // Required by nextauth, all null allowed
   emailVerifiedAt: timestamptz('email_verified_at'),
 
+  // Password hash for credentials login
+  passwordHash: text('password_hash'),
+
   preference: jsonb('preference').$defaultFn(() => DEFAULT_PREFERENCE),
 
   ...timestamps,

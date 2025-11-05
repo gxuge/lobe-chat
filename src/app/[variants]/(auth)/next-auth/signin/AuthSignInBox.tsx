@@ -3,31 +3,49 @@
 import { BRANDING_NAME, DOCUMENTS_REFER_URL, PRIVACY_URL, TERMS_URL } from '@lobechat/const';
 import { Button, Text } from '@lobehub/ui';
 import { LobeHub } from '@lobehub/ui/brand';
-import { Col, Flex, Row, Skeleton } from 'antd';
+import { Col, Flex, Row, Skeleton, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
 import { AuthError } from 'next-auth';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import BrandWatermark from '@/components/BrandWatermark';
 import AuthIcons from '@/components/NextAuth/AuthIcons';
 import { useUserStore } from '@/store/user';
 
+import CredentialsForm from './CredentialsForm';
+
 const useStyles = createStyles(({ css, token }) => ({
   button: css`
     text-transform: capitalize;
   `,
   container: css`
-    min-width: 360px;
+    width: 100%;
+    min-width: 320px;
+    max-width: 480px;
     border: 1px solid ${token.colorBorder};
     border-radius: ${token.borderRadiusLG}px;
+
     background: ${token.colorBgContainer};
+    box-shadow: 0 0 0 1px ${token.colorBorderSecondary};
+
+    @media (max-width: 768px) {
+      width: calc(100vw - 2rem);
+      min-width: unset;
+      max-width: calc(100vw - 2rem);
+      margin: 1rem;
+    }
   `,
   contentCard: css`
     padding-block: 2.5rem;
     padding-inline: 2rem;
+
+    @media (max-width: 768px) {
+      padding-block: 1.5rem;
+      padding-inline: 1.5rem;
+    }
   `,
   description: css`
     margin: 0;
@@ -36,11 +54,41 @@ const useStyles = createStyles(({ css, token }) => ({
   footer: css`
     padding: 1rem;
     border-block-start: 1px solid ${token.colorBorder};
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 ${token.borderRadiusLG}px ${token.borderRadiusLG}px;
 
     color: ${token.colorTextDescription};
 
     background: ${token.colorBgElevated};
+
+    @media (max-width: 768px) {
+      padding: 0.75rem;
+    }
+  `,
+  footerBrand: css`
+    justify-content: center;
+    height: 100%;
+
+    @media (min-width: 576px) {
+      justify-content: flex-start;
+    }
+  `,
+  footerLinks: css`
+    justify-content: center;
+
+    @media (min-width: 576px) {
+      justify-content: flex-end;
+    }
+  `,
+  link: css`
+    cursor: pointer;
+    color: ${token.colorPrimary};
+
+    &:hover {
+      color: ${token.colorPrimaryHover};
+    }
+  `,
+  linkHint: css`
+    font-size: ${token.fontSizeSM}px;
   `,
   text: css`
     text-align: center;
@@ -48,6 +96,10 @@ const useStyles = createStyles(({ css, token }) => ({
   title: css`
     margin: 0;
     color: ${token.colorTextHeading};
+
+    @media (max-width: 768px) {
+      font-size: ${token.fontSizeLG}px;
+    }
   `,
 }));
 
@@ -71,6 +123,7 @@ export default memo(() => {
   const { t } = useTranslation('clerk');
   const router = useRouter();
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('sso');
 
   const oAuthSSOProviders = useUserStore((s) => s.oAuthSSOProviders);
 
@@ -99,11 +152,71 @@ export default memo(() => {
     }
   };
 
+  // Filter out credentials provider from SSO providers
+  const ssoProviders = useMemo(() => {
+    return oAuthSSOProviders?.filter((provider) => provider !== 'credentials') || [];
+  }, [oAuthSSOProviders]);
+
+  // Check if credentials provider is available
+  const hasCredentials = useMemo(() => {
+    return oAuthSSOProviders?.includes('credentials') || false;
+  }, [oAuthSSOProviders]);
+
   const footerBtns = [
     { href: DOCUMENTS_REFER_URL, id: 0, label: t('footerPageLink__help') },
     { href: PRIVACY_URL, id: 1, label: t('footerPageLink__privacy') },
     { href: TERMS_URL, id: 2, label: t('footerPageLink__terms') },
   ];
+
+  const tabItems = useMemo(() => {
+    const items = [];
+
+    // SSO Providers tab
+    if (ssoProviders.length > 0) {
+      items.push({
+        children: (
+          <Flex gap="small" vertical>
+            {ssoProviders.map((provider) => (
+              <Button
+                className={styles.button}
+                icon={AuthIcons(provider, 16)}
+                key={provider}
+                loading={loadingProvider === provider}
+                onClick={() => handleSignIn(provider)}
+              >
+                {provider}
+              </Button>
+            ))}
+          </Flex>
+        ),
+        key: 'sso',
+        label: 'SSO 登录',
+      });
+    }
+
+    // Credentials tab
+    if (hasCredentials) {
+      items.push({
+        children: (
+          <Flex gap="medium" vertical>
+            <CredentialsForm callbackUrl={callbackUrl} />
+            <div className={styles.text}>
+              <Text className={styles.linkHint} type="secondary">
+                还没有账号？
+                <span className={styles.link} onClick={() => router.push('/next-auth/signup')}>
+                  立即注册
+                </span>
+              </Text>
+            </div>
+          </Flex>
+        ),
+        key: 'credentials',
+        label: '账号密码',
+      });
+    }
+
+    return items;
+  }, [ssoProviders, hasCredentials, loadingProvider, callbackUrl, styles, router]);
 
   return (
     <div className={styles.container}>
@@ -122,36 +235,36 @@ export default memo(() => {
               {t('signIn.start.subtitle')}
             </Text>
           </div>
+
           {/* Content */}
-          <Flex gap="small" vertical>
-            {oAuthSSOProviders ? (
-              oAuthSSOProviders.map((provider) => (
-                <Button
-                  className={styles.button}
-                  icon={AuthIcons(provider, 16)}
-                  key={provider}
-                  loading={loadingProvider === provider}
-                  onClick={() => handleSignIn(provider)}
-                >
-                  {provider}
-                </Button>
-              ))
+          {oAuthSSOProviders ? (
+            tabItems.length > 1 ? (
+              <Tabs
+                activeKey={activeTab}
+                centered
+                items={tabItems}
+                onChange={(key) => setActiveTab(key)}
+              />
+            ) : tabItems.length === 1 ? (
+              tabItems[0].children
             ) : (
-              <BtnListLoading />
-            )}
-          </Flex>
+              <Text type="secondary">没有可用的登录方式</Text>
+            )
+          ) : (
+            <BtnListLoading />
+          )}
         </Flex>
       </div>
       <div className={styles.footer}>
         {/* Footer */}
-        <Row>
-          <Col span={12}>
-            <Flex justify="left" style={{ height: '100%' }}>
+        <Row gutter={[8, 8]}>
+          <Col sm={12} xs={24}>
+            <Flex className={styles.footerBrand}>
               <BrandWatermark />
             </Flex>
           </Col>
-          <Col offset={4} span={8}>
-            <Flex justify="right">
+          <Col sm={12} xs={24}>
+            <Flex className={styles.footerLinks} gap={4}>
               {footerBtns.map((btn) => (
                 <Button key={btn.id} onClick={() => router.push(btn.href)} size="small" type="text">
                   {btn.label}

@@ -6,9 +6,9 @@ services:
       args:
         USE_CN_MIRROR: "true"
         # 启用 NextAuth（构建时）
-        NEXT_PUBLIC_ENABLE_NEXT_AUTH: "1"
+        # NEXT_PUBLIC_ENABLE_NEXT_AUTH: "1"
         # 关闭 Clerk（构建时）
-        NEXT_PUBLIC_ENABLE_CLERK_AUTH: "0"
+        # NEXT_PUBLIC_ENABLE_CLERK_AUTH: "0"
     image: lobe-chat:database
     ports:
       - "3210:3210"
@@ -18,20 +18,22 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       KEY_VAULTS_SECRET: ${KEY_VAULTS_SECRET}
       APP_URL: "https://chat.woguoguoguo.top"
-      ENABLE_AUTH_PROTECTION: "1"
+      # ENABLE_AUTH_PROTECTION: "1"
       
       # 启用 NextAuth（运行时）
-      NEXT_PUBLIC_ENABLE_NEXT_AUTH: "1"
+      # NEXT_PUBLIC_ENABLE_NEXT_AUTH: "1"
       # 关闭 Clerk（运行时）
-      NEXT_PUBLIC_ENABLE_CLERK_AUTH: "0"
+      # NEXT_PUBLIC_ENABLE_CLERK_AUTH: "0"
       # NextAuth 基本设置
-      NEXT_AUTH_SECRET: ${NEXT_AUTH_SECRET}
-      NEXT_AUTH_SSO_PROVIDERS: "keycloak"
-      NEXTAUTH_URL: "https://chat.woguoguoguo.top/api/auth"
+      # NEXT_AUTH_SECRET: ${NEXT_AUTH_SECRET}
+      # NEXT_AUTH_SSO_PROVIDERS: "keycloak"
+      # NEXTAUTH_URL: "https://chat.woguoguoguo.top/api/auth"
+      NEXTAUTH_URL: "https://chat.woguoguoguo.top"
       # Keycloak Provider 配置
-      AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
-      AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
-      AUTH_KEYCLOAK_ISSUER: ${AUTH_KEYCLOAK_ISSUER}
+      # AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
+      # AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
+      # AUTH_KEYCLOAK_ISSUER: ${AUTH_KEYCLOAK_ISSUER}
+
       # OPTIONALS
       # ACCESS_CODE: ${ACCESS_CODE}
       # FEATURE_FLAGS: ${FEATURE_FLAGS}

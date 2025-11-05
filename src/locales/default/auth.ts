@@ -56,6 +56,11 @@ export default {
     prevMonth: '上个月',
     recent30Days: '最近30天',
   },
+  footerPageLink: {
+    help: '帮助',
+    privacy: '隐私',
+    terms: '条款',
+  },
   header: {
     desc: '管理您的账户信息。',
     title: '账户',
@@ -100,7 +105,10 @@ export default {
     username: '用户名',
   },
   signout: '退出登录',
-  signup: '注册',
+  signup: {
+    subtitle: '创建账号开始使用',
+    title: '注册 {{applicationName}}',
+  },
   stats: {
     aiheatmaps: 'AI 指数',
     assistants: '助手数',

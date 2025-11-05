@@ -5,6 +5,7 @@ import AzureAD from './azure-ad';
 import Casdoor from './casdoor';
 import CloudflareZeroTrust from './cloudflare-zero-trust';
 import Cognito from './cognito';
+import Credentials from './credentials';
 import Feishu from './feishu';
 import GenericOIDC from './generic-oidc';
 import Github from './github';
@@ -34,4 +35,5 @@ export const ssoProviders = [
   Cognito,
   Okta,
   Feishu,
+  Credentials,
 ];
