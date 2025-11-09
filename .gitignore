@@ -95,6 +95,8 @@ robots.txt
 # Documents and media
 *.patch
 *.pdf
+*.tar
+*.tar.gz
 
 # Cloud service keys
 vertex-ai-key.json
