@@ -2,8 +2,8 @@
 
 import { BookText, Cog, DatabaseIcon, FlagIcon, GlobeLockIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
-import CacheViewer from './CacheViewer';
 import FeatureFlagViewer from './FeatureFlagViewer';
 import MetadataViewer from './MetadataViewer';
 import PostgresViewer from './PostgresViewer';
@@ -11,6 +11,11 @@ import SystemInspector from './SystemInspector';
 
 const FloatPanel = dynamic(() => import('./features/FloatPanel'), {
   ssr: false,
+});
+
+// Dynamic import to avoid bundling Server Component in client
+const CacheViewer = dynamic(() => import('./CacheViewer'), {
+  ssr: true,
 });
 
 const DevPanel = () => (
@@ -27,7 +32,11 @@ const DevPanel = () => (
         key: 'SEO Metadata',
       },
       {
-        children: <CacheViewer />,
+        children: (
+          <Suspense fallback={<div>Loading cache...</div>}>
+            <CacheViewer />
+          </Suspense>
+        ),
         icon: <GlobeLockIcon size={16} />,
         key: 'NextJS Caches',
       },

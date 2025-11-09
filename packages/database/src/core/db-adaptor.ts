@@ -1,7 +1,6 @@
 import { isDesktop } from '@lobechat/const';
 
 import { LobeChatDatabase } from '../type';
-import { getPgliteInstance } from './electron';
 import { getDBInstance } from './web-server';
 
 /**
@@ -16,7 +15,13 @@ export const getServerDB = async (): Promise<LobeChatDatabase> => {
 
   try {
     // 根据环境选择合适的数据库实例
-    cachedDB = isDesktop ? await getPgliteInstance() : getDBInstance();
+    if (isDesktop) {
+      // Lazy import electron module to avoid loading in Edge Runtime (middleware)
+      const { getPgliteInstance } = await import('./electron');
+      cachedDB = await getPgliteInstance();
+    } else {
+      cachedDB = getDBInstance();
+    }
     return cachedDB;
   } catch (error) {
     console.error('❌ Failed to initialize database:', error);

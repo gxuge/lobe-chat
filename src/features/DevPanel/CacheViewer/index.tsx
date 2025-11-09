@@ -2,11 +2,11 @@ import { Empty } from 'antd';
 import { Center } from 'react-layout-kit';
 
 import DataTable from './DataTable';
+import { refreshCacheFiles } from './actions';
 import { CachePanelContextProvider } from './cacheProvider';
-import { getCacheFiles } from './getCacheEntries';
 
 const CacheViewer = async () => {
-  const files = await getCacheFiles();
+  const files = await refreshCacheFiles();
 
   if (!files || files.length === 0)
     return (

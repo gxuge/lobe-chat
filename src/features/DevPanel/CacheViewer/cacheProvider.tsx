@@ -10,7 +10,7 @@ import {
   useTransition,
 } from 'react';
 
-import { getCacheFiles } from './getCacheEntries';
+import { refreshCacheFiles } from './actions';
 import type { NextCacheFileData } from './schema';
 
 interface CachePanelContextProps {
@@ -40,7 +40,7 @@ export const CachePanelContextProvider = (
 
   const refreshData = () => {
     startTransition(async () => {
-      const files = await getCacheFiles();
+      const files = await refreshCacheFiles();
       setEntries(files ?? []);
     });
   };

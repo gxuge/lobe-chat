@@ -1,5 +1,3 @@
-'use server';
-
 import { existsSync, promises } from 'node:fs';
 import pMap from 'p-map';
 import { ZodError } from 'zod';
@@ -8,6 +6,7 @@ import { type NextCacheFileData, nextCacheFileSchema } from './schema';
 
 const cachePath = '.next/cache/fetch-cache';
 
+// This function is only used in Server Components
 export const getCacheFiles = async (): Promise<NextCacheFileData[]> => {
   if (!existsSync(cachePath)) {
     return [];
