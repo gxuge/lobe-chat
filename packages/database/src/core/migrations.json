@@ -682,5 +682,11 @@
     "bps": true,
     "folderMillis": 1760108430562,
     "hash": "ce09b301abb80f6563abc2f526bdd20b4f69bae430f09ba2179b9e3bfec43067"
+  },
+  {
+    "sql": ["ALTER TABLE \"users\" ADD COLUMN \"password_hash\" text;"],
+    "bps": true,
+    "folderMillis": 1762671966909,
+    "hash": "b12065c0398e2a2ed1814c5968830261dfc22d04747a08346fe9a87e09df205c"
   }
 ]
