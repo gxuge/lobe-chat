@@ -53,7 +53,8 @@ ENV FEATURE_FLAGS="${FEATURE_FLAGS}"
 ENV NEXT_PUBLIC_SERVICE_MODE="${NEXT_PUBLIC_SERVICE_MODE:-server}" \
     # NEXT_PUBLIC_ENABLE_NEXT_AUTH="${NEXT_PUBLIC_ENABLE_NEXT_AUTH:-1}" \
     # NEXT_PUBLIC_ENABLE_CLERK_AUTH="${NEXT_PUBLIC_ENABLE_CLERK_AUTH:-0}" \
-    APP_URL="http://localhost:3015" \
+    # Build 阶段使用 localhost（构建时不需要外部访问）
+    APP_URL="http://localhost:3210" \
     DATABASE_DRIVER="node" \
     DATABASE_URL="postgres://postgres:635764803@106.52.245.55:5432/postgres?sslmode=no-verify" \
     KEY_VAULTS_SECRET="jgwsK28dspyVQoIf8/M3IIHl1h6LYYceSYNXeLpy6uk="
@@ -84,7 +85,7 @@ COPY packages ./packages
 
 RUN \
     # If you want to build docker in China, build with --build-arg USE_CN_MIRROR=true
-    if [ "${USE_CN_MIRROR:-false}" = "true" ]; then \
+    if [ "${USE_CN_MIRROR:-true}" = "true" ]; then \
         export SENTRYCLI_CDNURL="https://npmmirror.com/mirrors/sentry-cli"; \
         npm config set registry "https://registry.npmmirror.com/"; \
         echo 'canvas_binary_host_mirror=https://npmmirror.com/mirrors/canvas' >> .npmrc; \
@@ -162,12 +163,13 @@ ENV HOSTNAME="0.0.0.0" \
 
 # General Variables
 ENV ACCESS_CODE="" \
-    APP_URL="http://localhost:3015" \
+    # APP_URL 用于容器内部 API 调用（使用 localhost 避免 SSL 证书问题）
+    APP_URL="http://localhost:3210" \
     API_KEY_SELECT_MODE="" \
     DEFAULT_AGENT_CONFIG="" \
     SYSTEM_AGENT="" \
     FEATURE_FLAGS="" \
-    PROXY_URL="" 
+    PROXY_URL=""
     # ENABLE_AUTH_PROTECTION=""
 
 # Database

@@ -1,15 +1,13 @@
 'use client';
 
-import { BRANDING_NAME, DOCUMENTS_REFER_URL, PRIVACY_URL, TERMS_URL } from '@lobechat/const';
-import { Button, Text } from '@lobehub/ui';
-import { LobeHub } from '@lobehub/ui/brand';
-import { Col, Flex, Row } from 'antd';
+import { BRANDING_NAME } from '@lobechat/const';
+import { Text } from '@lobehub/ui';
+import { Flex } from 'antd';
 import { createStyles } from 'antd-style';
 import { useRouter } from 'next/navigation';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import BrandWatermark from '@/components/BrandWatermark';
 
 import SignupForm from './SignupForm';
 
@@ -104,12 +102,6 @@ export default memo(() => {
   const { t } = useTranslation('auth');
   const router = useRouter();
 
-  const footerBtns = [
-    { href: DOCUMENTS_REFER_URL, id: 0, label: t('footerPageLink.help') },
-    { href: PRIVACY_URL, id: 1, label: t('footerPageLink.privacy') },
-    { href: TERMS_URL, id: 2, label: t('footerPageLink.terms') },
-  ];
-
   return (
     <div className={styles.container}>
       <div className={styles.contentCard}>
@@ -118,9 +110,7 @@ export default memo(() => {
           {/* Header */}
           <div className={styles.text}>
             <Text as={'h4'} className={styles.title}>
-              <div>
-                <LobeHub size={48} />
-              </div>
+              {/* Hidden: LobeHub logo */}
               {t('signup.title', { applicationName: BRANDING_NAME })}
             </Text>
             <Text as={'p'} className={styles.description}>
@@ -142,25 +132,7 @@ export default memo(() => {
           </div>
         </Flex>
       </div>
-      <div className={styles.footer}>
-        {/* Footer */}
-        <Row gutter={[8, 8]}>
-          <Col sm={12} xs={24}>
-            <Flex className={styles.footerBrand}>
-              <BrandWatermark />
-            </Flex>
-          </Col>
-          <Col sm={12} xs={24}>
-            <Flex className={styles.footerLinks} gap={4}>
-              {footerBtns.map((btn) => (
-                <Button key={btn.id} onClick={() => router.push(btn.href)} size="small" type="text">
-                  {btn.label}
-                </Button>
-              ))}
-            </Flex>
-          </Col>
-        </Row>
-      </div>
+      {/* Footer removed - no help, privacy, terms links */}
     </div>
   );
 });

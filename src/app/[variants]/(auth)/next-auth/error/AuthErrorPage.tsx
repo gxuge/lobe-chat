@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ErrorCapture from '@/components/Error';
 
@@ -13,24 +14,28 @@ enum ErrorEnum {
   Verification = 'Verification',
 }
 
-const errorMap = {
-  [ErrorEnum.Configuration]:
-    'Wrong configuration, make sure you have the correct environment variables set. Visit https://lobehub.com/docs/self-hosting/advanced/authentication for more details.',
-  [ErrorEnum.AccessDenied]:
-    'Access was denied. Visit https://authjs.dev/reference/core/errors#accessdenied for more details. ',
-  [ErrorEnum.Verification]:
-    'Verification error, visit https://authjs.dev/reference/core/errors#verification for more details.',
-  [ErrorEnum.Default]:
-    'There was a problem when trying to authenticate. Visit https://authjs.dev/reference/core/errors for more details.',
-};
-
 export default memo(() => {
+  const { t } = useTranslation('auth');
   const search = useSearchParams();
   const error = search.get('error') as ErrorEnum;
+
+  // 获取友好的错误消息
+  const getErrorMessage = (errorType: string): string => {
+    const translationKey = `authErrors.${errorType}` as any;
+    const translated = t(translationKey, { defaultValue: '' }) as string;
+
+    // 如果没有翻译，返回默认消息
+    if (!translated) {
+      return t('authErrors.Default');
+    }
+
+    return translated;
+  };
+
   const props = {
     error: {
       cause: error,
-      message: errorMap[error] || 'Unknown error type.',
+      message: getErrorMessage(error || 'Default'),
       name: 'NextAuth Error',
     },
     reset: () => signIn(undefined, { callbackUrl: '/' }),

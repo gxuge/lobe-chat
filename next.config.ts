@@ -283,6 +283,11 @@ const nextConfig: NextConfig = {
       layers: true,
     };
 
+    // Force resolve require-in-the-middle to version 8.0.1
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias['require-in-the-middle'] = require.resolve('require-in-the-middle');
+
     // Disable/adjust cache on Vercel to avoid large packfile serialization and OOM
     if (process.env.VERCEL) {
       config.cache = false;

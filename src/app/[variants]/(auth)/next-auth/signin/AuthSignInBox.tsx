@@ -1,9 +1,8 @@
 'use client';
 
-import { BRANDING_NAME, DOCUMENTS_REFER_URL, PRIVACY_URL, TERMS_URL } from '@lobechat/const';
+import { BRANDING_NAME } from '@lobechat/const';
 import { Button, Text } from '@lobehub/ui';
-import { LobeHub } from '@lobehub/ui/brand';
-import { Col, Flex, Row, Skeleton, Tabs } from 'antd';
+import { Flex, Skeleton, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
 import { AuthError } from 'next-auth';
 import { signIn } from 'next-auth/react';
@@ -11,7 +10,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import BrandWatermark from '@/components/BrandWatermark';
 import AuthIcons from '@/components/NextAuth/AuthIcons';
 import { useUserStore } from '@/store/user';
 
@@ -162,12 +160,6 @@ export default memo(() => {
     return oAuthSSOProviders?.includes('credentials') || false;
   }, [oAuthSSOProviders]);
 
-  const footerBtns = [
-    { href: DOCUMENTS_REFER_URL, id: 0, label: t('footerPageLink__help') },
-    { href: PRIVACY_URL, id: 1, label: t('footerPageLink__privacy') },
-    { href: TERMS_URL, id: 2, label: t('footerPageLink__terms') },
-  ];
-
   const tabItems = useMemo(() => {
     const items = [];
 
@@ -226,9 +218,7 @@ export default memo(() => {
           {/* Header */}
           <div className={styles.text}>
             <Text as={'h4'} className={styles.title}>
-              <div>
-                <LobeHub size={48} />
-              </div>
+              {/* Hidden: LobeHub logo */}
               {t('signIn.start.title', { applicationName: BRANDING_NAME })}
             </Text>
             <Text as={'p'} className={styles.description}>
@@ -255,25 +245,7 @@ export default memo(() => {
           )}
         </Flex>
       </div>
-      <div className={styles.footer}>
-        {/* Footer */}
-        <Row gutter={[8, 8]}>
-          <Col sm={12} xs={24}>
-            <Flex className={styles.footerBrand}>
-              <BrandWatermark />
-            </Flex>
-          </Col>
-          <Col sm={12} xs={24}>
-            <Flex className={styles.footerLinks} gap={4}>
-              {footerBtns.map((btn) => (
-                <Button key={btn.id} onClick={() => router.push(btn.href)} size="small" type="text">
-                  {btn.label}
-                </Button>
-              ))}
-            </Flex>
-          </Col>
-        </Row>
-      </div>
+      {/* Footer removed - no help, privacy, terms links */}
     </div>
   );
 });

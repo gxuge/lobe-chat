@@ -17,18 +17,19 @@ services:
       DATABASE_DRIVER: "node"
       DATABASE_URL: ${DATABASE_URL}
       KEY_VAULTS_SECRET: ${KEY_VAULTS_SECRET}
-      APP_URL: "https://chat.woguoguoguo.top"
-      # ENABLE_AUTH_PROTECTION: "1"
-      
+      # APP_URL 用于容器内部 API 回调（使用本地 HTTP 避免 SSL 证书问题）
+      APP_URL: "http://localhost:3210"
+      ENABLE_AUTH_PROTECTION: ${ENABLE_AUTH_PROTECTION}
+
       # 启用 NextAuth（运行时）
-      # NEXT_PUBLIC_ENABLE_NEXT_AUTH: "1"
+      NEXT_PUBLIC_ENABLE_NEXT_AUTH: ${NEXT_PUBLIC_ENABLE_NEXT_AUTH}
       # 关闭 Clerk（运行时）
-      # NEXT_PUBLIC_ENABLE_CLERK_AUTH: "0"
+      NEXT_PUBLIC_ENABLE_CLERK_AUTH: ${NEXT_PUBLIC_ENABLE_CLERK_AUTH}
       # NextAuth 基本设置
-      # NEXT_AUTH_SECRET: ${NEXT_AUTH_SECRET}
-      # NEXT_AUTH_SSO_PROVIDERS: "keycloak"
-      # NEXTAUTH_URL: "https://chat.woguoguoguo.top/api/auth"
-      NEXTAUTH_URL: "https://chat.woguoguoguo.top"
+      NEXT_AUTH_SECRET: ${NEXT_AUTH_SECRET}
+      NEXT_AUTH_SSO_PROVIDERS: ${NEXT_AUTH_SSO_PROVIDERS}
+      # NEXTAUTH_URL 用于浏览器重定向（使用外部域名地址）
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
       # Keycloak Provider 配置
       # AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
       # AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
