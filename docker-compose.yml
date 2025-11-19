@@ -17,8 +17,8 @@ services:
       DATABASE_DRIVER: "node"
       DATABASE_URL: ${DATABASE_URL}
       KEY_VAULTS_SECRET: ${KEY_VAULTS_SECRET}
-      # APP_URL 用于容器内部 API 回调（使用本地 HTTP 避免 SSL 证书问题）
-      APP_URL: "http://localhost:3210"
+      # APP_URL 从 .env 读取，用于容器对外暴露的地址
+      APP_URL: ${APP_URL:-http://localhost:3210}
       ENABLE_AUTH_PROTECTION: ${ENABLE_AUTH_PROTECTION}
 
       # 启用 NextAuth（运行时）
@@ -30,20 +30,13 @@ services:
       NEXT_AUTH_SSO_PROVIDERS: ${NEXT_AUTH_SSO_PROVIDERS}
       # NEXTAUTH_URL 用于浏览器重定向（使用外部域名地址）
       NEXTAUTH_URL: ${NEXTAUTH_URL}
-      # Keycloak Provider 配置
-      # AUTH_KEYCLOAK_ID: ${AUTH_KEYCLOAK_ID}
-      # AUTH_KEYCLOAK_SECRET: ${AUTH_KEYCLOAK_SECRET}
-      # AUTH_KEYCLOAK_ISSUER: ${AUTH_KEYCLOAK_ISSUER}
 
-      # OPTIONALS
-      # ACCESS_CODE: ${ACCESS_CODE}
-      # FEATURE_FLAGS: ${FEATURE_FLAGS}
-      # OPENAI_API_KEY: ${OPENAI_API_KEY}
-      # S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
-      # S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
-      # S3_BUCKET: ${S3_BUCKET}
-      # S3_ENDPOINT: ${S3_ENDPOINT}
-      # S3_PUBLIC_DOMAIN: ${S3_PUBLIC_DOMAIN}
+      # S3 配置
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_PUBLIC_DOMAIN: ${S3_PUBLIC_DOMAIN}
     volumes:
       # 挂载应用运行时可能产生的持久化数据（如上传的文件、缓存等）
       - lobe_chat_data:/app/data

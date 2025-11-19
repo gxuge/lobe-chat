@@ -40,6 +40,8 @@ tmp/
 .env.local
 .env*.local
 .env.development
+# 允许提交 .env.production（非敏感配置模板）
+!.env.production
 venv/
 .venv/
 

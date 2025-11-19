@@ -7,6 +7,14 @@ pipeline {
         IMAGE_NAME = "lobe-chat:database"
         APP_PORT = "3210"
         DOCKER_BUILDKIT = "1"
+
+        // 从 Jenkins 凭据中读取敏感配置
+        // 在 Jenkins 中配置这些凭据：Manage Jenkins -> Credentials
+        DATABASE_URL = credentials('lobe-chat-database-url')
+        KEY_VAULTS_SECRET = credentials('lobe-chat-key-vaults-secret')
+        NEXT_AUTH_SECRET = credentials('lobe-chat-next-auth-secret')
+        S3_ACCESS_KEY_ID = credentials('lobe-chat-s3-access-key-id')
+        S3_SECRET_ACCESS_KEY = credentials('lobe-chat-s3-secret-access-key')
     }
 
     options {
@@ -46,6 +54,41 @@ pipeline {
                     pwd
                     echo "检查 docker-compose.yml 文件:"
                     ls -lh ${COMPOSE_FILE}
+                '''
+            }
+        }
+
+        stage('Prepare Environment') {
+            steps {
+                echo '⚙️ 准备环境变量...'
+                sh '''
+                    # 1. 从 .env.production 复制非敏感配置
+                    if [ -f .env.production ]; then
+                        echo "✅ 发现 .env.production 文件，复制为 .env"
+                        cp .env.production .env
+                    else
+                        echo "⚠️ 警告：.env.production 文件不存在，创建空 .env 文件"
+                        touch .env
+                    fi
+
+                    # 2. 追加 Jenkins 提供的敏感信息到 .env 文件
+                    echo "" >> .env
+                    echo "# ===================================" >> .env
+                    echo "# Jenkins 注入的敏感配置" >> .env
+                    echo "# 生成时间: $(date '+%Y-%m-%d %H:%M:%S')" >> .env
+                    echo "# 构建编号: ${BUILD_NUMBER}" >> .env
+                    echo "# ===================================" >> .env
+                    echo "APP_URL=https://chat.woguoguoguo.top" >> .env
+                    echo "DATABASE_URL=${DATABASE_URL}" >> .env
+                    echo "KEY_VAULTS_SECRET=${KEY_VAULTS_SECRET}" >> .env
+                    echo "NEXT_AUTH_SECRET=${NEXT_AUTH_SECRET}" >> .env
+                    echo "NEXTAUTH_URL=https://chat.woguoguoguo.top" >> .env
+                    echo "S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}" >> .env
+                    echo "S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}" >> .env
+
+                    echo "✅ 环境变量文件准备完成"
+                    echo "📄 .env 文件内容（隐藏敏感信息）:"
+                    cat .env | grep -v -E "(SECRET|PASSWORD|KEY|URL|DATABASE)" || echo "   [大部分配置为敏感信息，已隐藏]"
                 '''
             }
         }
