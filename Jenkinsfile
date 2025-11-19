@@ -198,14 +198,12 @@ pipeline {
         }
         failure {
             echo '❌ 构建失败！'
-            sh '''
-                echo "查看容器日志以诊断问题:"
-                docker compose -f ${COMPOSE_FILE} logs --tail=50 || true
-            '''
+            echo '💡 提示：请检查构建日志中的错误信息'
+            echo '💡 如需查看容器日志，请手动运行：docker compose logs --tail=50'
             // 可以在这里添加失败通知
         }
         always {
-            echo '🧹 清理工作区...'
+            echo '🧹 清理完成'
             // 清理工作区（可选）
             // cleanWs()
         }
