@@ -6,6 +6,7 @@ import { ReactNode } from 'react';
 import { isRtlLang } from 'rtl-detect';
 
 import Analytics from '@/components/Analytics';
+import QiankunAutoLogin from '@/components/QiankunAutoLogin';
 import { DEFAULT_LANG } from '@/const/locale';
 import { isDesktop } from '@/const/version';
 import PWAInstall from '@/features/PWAInstall';
@@ -16,6 +17,7 @@ import { DynamicLayoutProps } from '@/types/next';
 import { RouteVariants } from '@/utils/server/routeVariants';
 
 const inVercel = process.env.VERCEL === '1';
+const isQiankunMode = process.env.QIANKUN_MODE === 'true';
 
 interface RootLayoutProps extends DynamicLayoutProps {
   children: ReactNode;
@@ -33,6 +35,10 @@ const RootLayout = async ({ children, params, modal }: RootLayoutProps) => {
   return (
     <html dir={direction} lang={locale}>
       <head>
+        {isQiankunMode && (
+          // eslint-disable-next-line @next/next/no-sync-scripts
+          <script src="/qiankun-entry.js" />
+        )}
         {process.env.DEBUG_REACT_SCAN === '1' && (
           // eslint-disable-next-line @next/next/no-sync-scripts
           <script crossOrigin="anonymous" src="https://unpkg.com/react-scan/dist/auto.global.js" />
@@ -49,6 +55,7 @@ const RootLayout = async ({ children, params, modal }: RootLayoutProps) => {
             variants={variants}
           >
             <AuthProvider>
+              {isQiankunMode && <QiankunAutoLogin />}
               {children}
               {!isMobile && modal}
             </AuthProvider>

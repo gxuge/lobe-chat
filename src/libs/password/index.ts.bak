@@ -1,8 +1,5 @@
 import bcrypt from 'bcryptjs';
 
-// Export password generator from separate module
-export { generateRandomPassword } from './generate';
-
 /**
  * Hash a password using bcrypt
  * @param password - Plain text password
@@ -28,7 +25,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
  * @param password - Password to validate
  * @returns Validation result with error message if invalid
  */
-export function validatePassword(password: string): { error?: string; valid: boolean } {
+export function validatePassword(password: string): { error?: string, valid: boolean; } {
   if (!password) {
     return { error: '密码不能为空', valid: false };
   }
@@ -54,7 +51,7 @@ export function validatePassword(password: string): { error?: string; valid: boo
  * @param email - Email to validate
  * @returns Validation result with error message if invalid
  */
-export function validateEmail(email: string): { error?: string; valid: boolean } {
+export function validateEmail(email: string): { error?: string, valid: boolean; } {
   if (!email) {
     return { error: '邮箱不能为空', valid: false };
   }

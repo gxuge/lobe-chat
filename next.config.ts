@@ -9,6 +9,9 @@ const isDesktop = process.env.NEXT_PUBLIC_IS_DESKTOP_APP === '1';
 const enableReactScan = !!process.env.REACT_SCAN_MONITOR_API_KEY;
 const isUsePglite = process.env.NEXT_PUBLIC_CLIENT_DB === 'pglite';
 const shouldUseCSP = process.env.ENABLED_CSP === '1';
+// qiankun micro-frontend toggle (low coupling, only enabled when needed)
+const isQiankunMode = process.env.QIANKUN_MODE === 'true';
+const pkg = require('./package.json');
 
 // if you need to proxy the api endpoint to remote server
 
@@ -57,7 +60,7 @@ const nextConfig: NextConfig = {
       },
     ];
 
-    if (shouldUseCSP) {
+    if (shouldUseCSP && !isQiankunMode) {
       securityHeaders.push(
         {
           key: 'X-Frame-Options',
@@ -70,9 +73,27 @@ const nextConfig: NextConfig = {
       );
     }
 
+    // Qiankun micro-frontend: add CORS headers when in qiankun mode
+    const corsHeaders = isQiankunMode
+      ? [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: process.env.MAIN_APP_ORIGIN || '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET,POST,PUT,DELETE,OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'X-Requested-With,content-type,Authorization',
+          },
+        ]
+      : [];
+
     return [
       {
-        headers: securityHeaders,
+        headers: [...securityHeaders, ...corsHeaders],
         source: '/:path*',
       },
       {
@@ -277,7 +298,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  webpack(config) {
+  webpack(config, { isServer }) {
     config.experiments = {
       asyncWebAssembly: true,
       layers: true,
@@ -321,6 +342,20 @@ const nextConfig: NextConfig = {
     };
 
     // assetPrefix is no longer used; removed worker publicPath adjustment
+
+    // Qiankun micro-frontend: configure UMD output for client build
+    if (isQiankunMode && !isServer) {
+      console.log('[Qiankun] Configuring webpack for micro-frontend mode');
+
+      config.output = config.output || {};
+      config.output.library = `${pkg.name}-[name]`;
+      config.output.libraryTarget = 'umd';
+      config.output.globalObject = 'window';
+      config.output.chunkLoadingGlobal = `webpackJsonp_${pkg.name}`;
+
+      // Ensure public path is set correctly for qiankun
+      config.output.publicPath = 'auto';
+    }
 
     return config;
   },

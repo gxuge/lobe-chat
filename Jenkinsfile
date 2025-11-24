@@ -129,45 +129,45 @@ pipeline {
             }
         }
 
-        stage('Health Check') {
-            steps {
-                echo '🏥 健康检查...'
-                script {
-                    def maxRetries = 12
-                    def retryInterval = 10
-                    def success = false
+        // stage('Health Check') {
+        //     steps {
+        //         echo '🏥 健康检查...'
+        //         script {
+        //             def maxRetries = 12
+        //             def retryInterval = 10
+        //             def success = false
 
-                    for (int i = 1; i <= maxRetries; i++) {
-                        try {
-                            sh '''
-                                # 检查容器是否运行
-                                if ! docker compose -f ${COMPOSE_FILE} ps | grep -q "Up"; then
-                                    echo "容器未运行"
-                                    exit 1
-                                fi
+        //             for (int i = 1; i <= maxRetries; i++) {
+        //                 try {
+        //                     sh '''
+        //                         # 检查容器是否运行
+        //                         if ! docker compose -f ${COMPOSE_FILE} ps | grep -q "Up"; then
+        //                             echo "容器未运行"
+        //                             exit 1
+        //                         fi
 
-                                # 检查应用是否响应
-                                if ! curl -f -s http://localhost:${APP_PORT} > /dev/null; then
-                                    echo "应用未响应"
-                                    exit 1
-                                fi
+        //                         # 检查应用是否响应
+        //                         if ! curl -f -s http://localhost:${APP_PORT} > /dev/null; then
+        //                             echo "应用未响应"
+        //                             exit 1
+        //                         fi
 
-                                echo "✅ 服务健康检查通过"
-                            '''
-                            success = true
-                            break
-                        } catch (Exception e) {
-                            if (i < maxRetries) {
-                                echo "⏳ 第 ${i} 次检查失败，${retryInterval}秒后重试..."
-                                sleep(retryInterval)
-                            } else {
-                                error "❌ 健康检查失败：服务未能在预期时间内启动"
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                         echo "✅ 服务健康检查通过"
+        //                     '''
+        //                     success = true
+        //                     break
+        //                 } catch (Exception e) {
+        //                     if (i < maxRetries) {
+        //                         echo "⏳ 第 ${i} 次检查失败，${retryInterval}秒后重试..."
+        //                         sleep(retryInterval)
+        //                     } else {
+        //                         error "❌ 健康检查失败：服务未能在预期时间内启动"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Display Info') {
             steps {

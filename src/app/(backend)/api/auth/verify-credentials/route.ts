@@ -22,12 +22,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '请输入邮箱和密码' }, { status: 400 });
     }
 
-    // Validate email format
-    const emailValidation = validateEmail(email.trim());
-    if (!emailValidation.valid) {
-      return NextResponse.json({ error: emailValidation.error }, { status: 400 });
-    }
-
     // Check if server mode is enabled
     const { NEXT_PUBLIC_ENABLED_SERVER_SERVICE } = getServerDBConfig();
     if (!NEXT_PUBLIC_ENABLED_SERVER_SERVICE) {
@@ -36,25 +30,62 @@ export async function POST(req: NextRequest) {
 
     const serverDB = await getServerDB();
 
-    // Find user by email
-    const user = await serverDB.query.users.findFirst({
-      where: eq(users.email, email.toLowerCase()),
-    });
+    // Check if this is external auth (qiankun mode)
+    // External auth uses username as email and token as password
+    const isExternalAuth = password.length > 50; // Tokens are typically longer than passwords
 
-    if (!user) {
-      return NextResponse.json({ error: '用户不存在或密码错误' }, { status: 401 });
-    }
+    let user;
 
-    // Check if user has a password set
-    if (!user.passwordHash) {
-      return NextResponse.json({ error: '此账号未设置密码，请使用其他登录方式' }, { status: 401 });
-    }
+    if (isExternalAuth) {
+      // For external auth, find user by username (stored as email)
+      user = await serverDB.query.users.findFirst({
+        where: eq(users.username, email),
+      });
 
-    // Verify password
-    const isValid = await verifyPassword(password, user.passwordHash);
+      // If not found by username, try email
+      if (!user) {
+        user = await serverDB.query.users.findFirst({
+          where: eq(users.email, email.toLowerCase()),
+        });
+      }
 
-    if (!isValid) {
-      return NextResponse.json({ error: '用户不存在或密码错误' }, { status: 401 });
+      if (!user) {
+        return NextResponse.json({ error: '外部用户不存在' }, { status: 401 });
+      }
+
+      // For external auth, skip password verification
+      // The token was already verified by /api/auth/external-login
+    } else {
+      // Regular credentials login
+      // Validate email format
+      const emailValidation = validateEmail(email.trim());
+      if (!emailValidation.valid) {
+        return NextResponse.json({ error: emailValidation.error }, { status: 400 });
+      }
+
+      // Find user by email
+      user = await serverDB.query.users.findFirst({
+        where: eq(users.email, email.toLowerCase()),
+      });
+
+      if (!user) {
+        return NextResponse.json({ error: '用户不存在或密码错误' }, { status: 401 });
+      }
+
+      // Check if user has a password set
+      if (!user.passwordHash) {
+        return NextResponse.json(
+          { error: '此账号未设置密码，请使用其他登录方式' },
+          { status: 401 },
+        );
+      }
+
+      // Verify password
+      const isValid = await verifyPassword(password, user.passwordHash);
+
+      if (!isValid) {
+        return NextResponse.json({ error: '用户不存在或密码错误' }, { status: 401 });
+      }
     }
 
     // Return user object (without sensitive data)

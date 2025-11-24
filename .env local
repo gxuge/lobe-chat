@@ -42,3 +42,7 @@ S3_ENDPOINT=https://838de6c927cbb6dc5aa8476ec542f803.r2.cloudflarestorage.com
 # 存储桶对外的访问域名
 S3_PUBLIC_DOMAIN=https://oss.6357648.xyz
 
+#微前端配置
+QIANKUN_MODE=true
+MAIN_APP_ORIGIN=http://localhost:3100
+NEXT_PUBLIC_ENABLED_SERVER_SERVICE=1
